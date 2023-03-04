@@ -11,7 +11,7 @@ const CONTEXT_DATA: Context = {
             {
                 positionId: 1,
                 insightId: '1483783',
-                quantity: 200       
+                quantity: 600       
             },
             {
                 positionId: 2,

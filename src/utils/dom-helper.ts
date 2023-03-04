@@ -26,6 +26,7 @@ export const build = (type: string, options: HtmlElementBuilderOptions = {}): HT
 
     if (!visible) element.style.display = 'none';
 
+    //CSSStyleDeclaration
     for (const [key, value] of Object.entries(attributes)) {
         element.setAttribute(key, value);
     }
