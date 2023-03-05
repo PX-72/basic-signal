@@ -1,18 +1,12 @@
-type SignalAction = {
-    execute: () => void
-};
+type Execute = () => void;
 
-const context: SignalAction[] = [];
+const context: Execute[] = [];
 
-const getCurrentObserver = () => {
-    return context[context.length - 1];
-};
+const getCurrentExecuteFn = () => context.at(-1);
 
 export const createEffect = (fn: () => void): void => {
     const execute = () => {
-        //cleanup();
-        console.log('Pusing on stack');
-        context.push({ execute });
+        context.push(execute);
         try {
             fn();
         } finally {
@@ -23,25 +17,20 @@ export const createEffect = (fn: () => void): void => {
     execute();
 };
 
-export const createSignal = <T>(value: T): [() => T, (val:T) => void] => {
-    const subscibers = new Set<SignalAction>();
+export const createSignal = <T>(value: T): [() => T, (val: T) => void] => {
+    const executeFns = new Set<Execute>();
 
-    const read = (): T => {
-        const running = getCurrentObserver();
-        
-        // subscribers
-        if (running) 
-            subscibers.add(running);
+    const get = (): T => {
+        const execute = getCurrentExecuteFn();
+        if (execute) executeFns.add(execute);
 
         return value;
     };
 
-    const write = (nextValue: T) => {
+    const set = (nextValue: T) => {
         value = nextValue;
-
-        // notify subscribers
-        for (const sub of subscibers) sub.execute();
+        for (const execute of executeFns) execute();
     };
 
-    return [read, write];
-}
+    return [get, set];
+};

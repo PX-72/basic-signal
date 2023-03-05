@@ -10,27 +10,17 @@ const SUM_STYLE = {
 
 const sum = (quantities: number[] = []) => quantities.reduce((sum, qty) => sum + qty, 0);
 
-const updateQtySum = (sumElement: HTMLElement, positions: Position[], posId: number, newQty: number): void => {
-    const position = positions.find(({ positionId }) => positionId === posId);
-    if (position) {
-        position.quantity = newQty;
-        sumElement.innerText = sum(positions.map(p => p.quantity))?.toString();
-    }
-};
-
 export const createPortfolio = ({ code, currency, positions = [] }: Portfolio): HTMLElement => {
     const total = sum(positions.map(p => p.quantity));
     const summaryElement = build('span', { text: total.toString(), style: SUM_STYLE });
 
-    console.log('createPortfolio is called');
-
-    const [ getSum, readSum ] = createSignal(total);
+    const [ getSum, setSum ] = createSignal(total);
     createEffect(
         () => {
-            console.log('createEffect is called');
             const position = positions.find(({ positionId }) => positionId === 1);
+            const newQty = getSum();
             if (position) {
-                position.quantity = getSum();
+                position.quantity = newQty;
                 summaryElement.innerText = sum(positions.map(p => p.quantity))?.toString();
             }
         }
@@ -44,8 +34,6 @@ export const createPortfolio = ({ code, currency, positions = [] }: Portfolio): 
             build('p', { text: 'Position qty total: ' }),
             summaryElement
         ),
-        createPositionList(positions, 
-            (posId: number, newQty: number) => readSum(newQty))
-            //(posId: number, newQty: number) => updateQtySum(summaryElement, positions, posId, newQty))
+        createPositionList(positions, (posId: number, newQty: number) => setSum(newQty))
     );
 };
