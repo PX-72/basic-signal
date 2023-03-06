@@ -8,20 +8,21 @@ const SUM_STYLE = {
     color: 'red'
 };
 
-const sum = (quantities: number[] = []) => quantities.reduce((sum, qty) => sum + qty, 0);
+const quantityTotal = (positions: Position[] = []) => positions.reduce((sum, position) => sum + position.quantity, 0);
+const [ getUpdatedPosition, setUpdatedPosition ] = createSignal<Position | null>(null);
 
 export const createPortfolio = ({ code, currency, positions = [] }: Portfolio): HTMLElement => {
-    const total = sum(positions.map(p => p.quantity));
-    const summaryElement = build('span', { text: total.toString(), style: SUM_STYLE });
+    const summaryElement = build('span', { text: quantityTotal(positions).toString(), style: SUM_STYLE });
 
-    const [ getSum, setSum ] = createSignal(total);
     createEffect(
         () => {
-            const position = positions.find(({ positionId }) => positionId === 1);
-            const newQty = getSum();
+            const updatedPosition = getUpdatedPosition();
+            if (updatedPosition == null) return;
+
+            const position = positions.find(({ positionId }) => positionId === updatedPosition.positionId);
             if (position) {
-                position.quantity = newQty;
-                summaryElement.innerText = sum(positions.map(p => p.quantity))?.toString();
+                position.quantity = updatedPosition.quantity;
+                summaryElement.innerText = quantityTotal(positions).toString();
             }
         }
     );
@@ -34,6 +35,6 @@ export const createPortfolio = ({ code, currency, positions = [] }: Portfolio): 
             build('p', { text: 'Position qty total: ' }),
             summaryElement
         ),
-        createPositionList(positions, (posId: number, newQty: number) => setSum(newQty))
+        createPositionList(positions, (updatedPosition: Position) => setUpdatedPosition(updatedPosition))
     );
 };

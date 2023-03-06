@@ -4,10 +4,10 @@ import { build, append } from "./utils/dom-helper.js";
 
 export const createPositionList = (
   positionListData: Position[] = [],
-  posQtyChanged: (posId: number, newQty: number) => void
+  updatePosition: (updatedPosition: Position) => void
 ): HTMLElement =>
   append(
     build("div"),
     build("h4", { text: "Positions:" }),
-    ...positionListData.map((position) => createPosition(position, posQtyChanged))
+    ...positionListData.map((position) => createPosition(position, updatePosition))
   );

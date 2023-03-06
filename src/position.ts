@@ -27,8 +27,8 @@ const TEXT_BLOCK_STYLE = {
     'margin-left': '0.5rem'
 };
 
-export const createPosition = (positionData: Position, posQtyChanged: (posId: number, newQty: number) => void): HTMLElement => {
-    const { positionId, insightId, quantity = 0 } = positionData;
+export const createPosition = (position: Position, updatePosition: (updatedPosition: Position) => void): HTMLElement => {
+    const { positionId, insightId, quantity = 0 } = position;
 
     const qtyText = build('span', { 
         text: quantity.toString(), 
@@ -67,7 +67,8 @@ export const createPosition = (positionData: Position, posQtyChanged: (posId: nu
         eventType: 'click', 
         eventCallback: () => {
             toggleVisibility([editButton, saveButton, qtyText, qtyInput], 'inline-block');
-            posQtyChanged(positionId, Number(qtyInput.value));
+            position.quantity = Number(qtyInput.value);
+            updatePosition(position);
         }
     });
 
